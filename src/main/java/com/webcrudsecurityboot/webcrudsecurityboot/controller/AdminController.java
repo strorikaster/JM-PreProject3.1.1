@@ -89,7 +89,8 @@ public class AdminController {
             roles.add(roleService.show(roleId));
         }
         user.setRoles(roles);
-        userService.update(id, user);
+        user.getId();
+        userService.update(user);
         return "redirect:/admin";
     }
 

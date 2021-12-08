@@ -26,7 +26,7 @@ public class UserRepositoryImpl implements UserRepository {
         System.out.println("User saved");
     }
 
-    public void update(Long id, User updatedUser) {
+    public void update(User updatedUser) {
         entityManager.merge(updatedUser);
         System.out.println("Merge is work");
     }
