@@ -5,6 +5,7 @@ import com.webcrudsecurityboot.webcrudsecurityboot.model.User;
 import com.webcrudsecurityboot.webcrudsecurityboot.service.RoleService;
 import com.webcrudsecurityboot.webcrudsecurityboot.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -32,14 +33,17 @@ public class AdminController {
     }
 
     @GetMapping(value = "admin/all")
-    public String allUsers(ModelMap model) {
-        model.addAttribute("users", userService.getAllUsers());
+    public String allUsers(@AuthenticationPrincipal User user, Model model) {
+        model.addAttribute("user", user);
+        model.addAttribute("allUsers", userService.getAllUsers());
+        model.addAttribute("roles", roleService.getAllRoles());
         return "index";
     }
 
     @GetMapping("admin/{id}")
-    public String show(@PathVariable("id") Long id, Model model) {
-        model.addAttribute("user", userService.show(id));
+    public String show(@AuthenticationPrincipal User user, @PathVariable("id") Long id, Model model) {
+        model.addAttribute("user", userService.show(user.getId()));
+        model.addAttribute("role", roleService.show(user.getId()));
         return "show";
     }
 
@@ -89,7 +93,8 @@ public class AdminController {
             roles.add(roleService.show(roleId));
         }
         user.setRoles(roles);
-        userService.update(id, user);
+        user.getId();
+        userService.update(user);
         return "redirect:/admin";
     }
 
