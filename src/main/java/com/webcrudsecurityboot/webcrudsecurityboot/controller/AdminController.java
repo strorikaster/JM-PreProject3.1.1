@@ -5,6 +5,7 @@ import com.webcrudsecurityboot.webcrudsecurityboot.model.User;
 import com.webcrudsecurityboot.webcrudsecurityboot.service.RoleService;
 import com.webcrudsecurityboot.webcrudsecurityboot.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.HashSet;
+import java.util.Set;
 
 @Controller
 public class AdminController {
@@ -32,14 +34,17 @@ public class AdminController {
     }
 
     @GetMapping(value = "admin/all")
-    public String allUsers(ModelMap model) {
-        model.addAttribute("users", userService.getAllUsers());
+    public String allUsers(@AuthenticationPrincipal User user, Model model) {
+        model.addAttribute("user", user);
+        model.addAttribute("allUsers", userService.getAllUsers());
+        model.addAttribute("roles", roleService.getAllRoles());
         return "index";
     }
 
     @GetMapping("admin/{id}")
-    public String show(@PathVariable("id") Long id, Model model) {
-        model.addAttribute("user", userService.show(id));
+    public String show(@AuthenticationPrincipal User user, @PathVariable("id") Long id, Model model) {
+        model.addAttribute("user", userService.show(user.getId()));
+        model.addAttribute("role", roleService.show(user.getId()));
         return "show";
     }
 
@@ -47,7 +52,7 @@ public class AdminController {
     public String addUser(Model model,
                           @ModelAttribute("user") User user,
                           @ModelAttribute("role") Role role) {
-        model.addAttribute("allRoles", roleService.getAllRoles());
+        model.addAttribute("roles", roleService.getAllRoles());
         return "new";
     }
 
@@ -70,9 +75,9 @@ public class AdminController {
 
 
     @GetMapping(value = "admin/{id}/edit")
-    public String editUser(ModelMap model, @PathVariable("id") Long id) {
+    public String editUser(Model model, @PathVariable("id") Long id) {
         model.addAttribute("user", userService.show(id));
-        model.addAttribute("allRoles", roleService.getAllRoles());
+        model.addAttribute("roles", roleService.getAllRoles());
         return "edit";
     }
 
@@ -84,12 +89,13 @@ public class AdminController {
         if(bindingResult.hasErrors()) {
             return "edit";
         }
-        HashSet<Role> roles = new HashSet();
+        Set<Role> roles = new HashSet();
         for(Long roleId : rolesId) {
             roles.add(roleService.show(roleId));
         }
         user.setRoles(roles);
-        userService.update(id, user);
+        user.getId();
+        userService.update(user);
         return "redirect:/admin";
     }
 
