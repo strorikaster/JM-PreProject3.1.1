@@ -26,7 +26,7 @@ public class UserRepositoryImpl implements UserRepository {
         System.out.println("User saved");
     }
 
-    public void update(Long id, User updatedUser) {
+    public void update(User updatedUser) {
         entityManager.merge(updatedUser);
         System.out.println("Merge is work");
     }
@@ -36,7 +36,7 @@ public class UserRepositoryImpl implements UserRepository {
         entityManager.remove(user);
     }
 
-    public User findByName(String name) {
-        return (User)entityManager.createQuery("SELECT u FROM User u where u.name = :name").setParameter("name", name).getSingleResult();
+    public User findByName(String email) {
+        return entityManager.createQuery("SELECT u FROM User u where u.email = :email", User.class).setParameter("email", email).getSingleResult();
     }
 }
