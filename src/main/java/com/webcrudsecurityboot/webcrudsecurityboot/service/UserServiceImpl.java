@@ -43,11 +43,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void update(Long id, User updatedUser) {
-        if(!show(id).getPassword().equals(updatedUser.getPassword())) {
+    public void update(User updatedUser) {
+//        if(!show(updatedUser.getId()).getPassword().equals(updatedUser.getPassword())) {
+//            updatedUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+//        }
+        if(!updatedUser.getPassword().equals(userRepository.show(updatedUser.getId()).getPassword())) {
             updatedUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
         }
-        userRepository.update(id, updatedUser);
+        userRepository.update(updatedUser);
     }
 
     @Override
@@ -57,10 +60,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String name) throws UsernameNotFoundException {
-        User user = userRepository.findByName(name);
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = userRepository.findByName(email);
         if(user == null) {
-            throw new UsernameNotFoundException("User " + name + " not found!");
+            throw new UsernameNotFoundException("User " + email + " not found!");
+
         }
         return user;
     }

@@ -5,14 +5,15 @@ import com.webcrudsecurityboot.webcrudsecurityboot.model.User;
 import com.webcrudsecurityboot.webcrudsecurityboot.service.RoleService;
 import com.webcrudsecurityboot.webcrudsecurityboot.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.HashSet;
+import java.util.Set;
 
 @Controller
 public class AdminController {
@@ -26,20 +27,58 @@ public class AdminController {
         this.roleService = roleService;
     }
 
+    @GetMapping(value = "/")
+    public String start(){
+        return "redirect:/login";
+    }
+
+    @GetMapping(value = "/login")
+    public String login() {
+            return "login";
+    }
+
+    @GetMapping(value = "/registration")
+    public String registration(Model model,
+                               @ModelAttribute("user") User user,
+                               @ModelAttribute("role") Role role) {
+        model.addAttribute("roles", roleService.getAllRoles());
+        return "registration";
+    }
+
+    @PostMapping(value = "/registration")
+    public String registration(@ModelAttribute("user") User user,
+                              @RequestParam("rolesSelected") Long[] rolesId,
+                              BindingResult bindingResult) {
+        if(bindingResult.hasErrors()) {
+            return "registration";
+        }
+        HashSet<Role> roles = new HashSet<>();
+        for(Long roleId : rolesId) {
+            roles.add(roleService.show(roleId));
+        }
+
+        user.setRoles(roles);
+        userService.save(user);
+        return "redirect:/admin";
+    }
+
     @GetMapping(value = "/admin")
     public String welcome() {
         return "redirect:/admin/all";
     }
 
     @GetMapping(value = "admin/all")
-    public String allUsers(ModelMap model) {
-        model.addAttribute("users", userService.getAllUsers());
+    public String allUsers(@AuthenticationPrincipal User user, Model model) {
+        model.addAttribute("user", user);
+        model.addAttribute("allUsers", userService.getAllUsers());
+        model.addAttribute("roles", roleService.getAllRoles());
         return "index";
     }
 
     @GetMapping("admin/{id}")
-    public String show(@PathVariable("id") Long id, Model model) {
-        model.addAttribute("user", userService.show(id));
+    public String show(@AuthenticationPrincipal User user, @PathVariable("id") Long id, Model model) {
+        model.addAttribute("user", userService.show(user.getId()));
+        model.addAttribute("role", roleService.show(user.getId()));
         return "show";
     }
 
@@ -47,7 +86,7 @@ public class AdminController {
     public String addUser(Model model,
                           @ModelAttribute("user") User user,
                           @ModelAttribute("role") Role role) {
-        model.addAttribute("allRoles", roleService.getAllRoles());
+        model.addAttribute("roles", roleService.getAllRoles());
         return "new";
     }
 
@@ -70,27 +109,24 @@ public class AdminController {
 
 
     @GetMapping(value = "admin/{id}/edit")
-    public String editUser(ModelMap model, @PathVariable("id") Long id) {
+    public String editUser(Model model, @PathVariable("id") Long id) {
         model.addAttribute("user", userService.show(id));
-        model.addAttribute("allRoles", roleService.getAllRoles());
+        model.addAttribute("roles", roleService.getAllRoles());
         return "edit";
     }
 
     @PatchMapping("admin/{id}")
-    public String update(@ModelAttribute("user") @Valid User user, @PathVariable("id") Long id,
-                         @RequestParam("rolesSelected") Long[] rolesId,
-                         BindingResult bindingResult
+    public String update(@ModelAttribute("user") User user,
+                         @RequestParam("rolesSelected") Long[] rolesId
+
     ) {
-        if(bindingResult.hasErrors()) {
-            return "edit";
-        }
-        HashSet<Role> roles = new HashSet();
+        Set<Role> roles = new HashSet();
         for(Long roleId : rolesId) {
             roles.add(roleService.show(roleId));
         }
         user.setRoles(roles);
-        userService.update(id, user);
-        return "redirect:/admin";
+        userService.update(user);
+        return "redirect:/admin/all";
     }
 
     @DeleteMapping("admin/{id}")
@@ -98,4 +134,17 @@ public class AdminController {
         userService.delete(id);
         return "redirect:/admin";
     }
+
+    @GetMapping(value = "/user")
+    public String getUserPage(Model model, @AuthenticationPrincipal User user) {
+        model.addAttribute("user", user);
+        return "show";
+    }
+
+    @GetMapping("/{id}")
+    public String show(@PathVariable("id") Long id, ModelMap modelMap) {
+        modelMap.addAttribute("user", userService.show(id));
+        return "show";
+    }
+
 }

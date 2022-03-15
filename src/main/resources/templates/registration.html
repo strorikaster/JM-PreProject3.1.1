@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="layouts/layout">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <title>Register new user</title>
+</head>
+<body>
+
+<div class="text-center mt-5">
+<form th:method="POST" th:action="@{/admin/add}" th:object="${user}">
+
+<!--        <form class="form-signin" action="/registration" method="post" style="max-width: 400px; margin: auto;">-->
+        <label>Register new user:</label>
+        <br>
+        <label for="name">Enter user name:</label>
+        <input type="text" th:field="*{name}" id="name"/>
+        <div style="color:red" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Name error</div>
+        <br>
+        <label for="surname">Enter user surname:</label>
+        <input type="text" th:field="*{surName}" id="surname"/>
+        <div style="color:red" th:if="${#fields.hasErrors('surName')}" th:errors="*{surName}">Surname error</div>
+        <br>
+        <label for="email">Enter user email:</label>
+        <input type="text" th:field="*{email}" id="email"/>
+        <div style="color:red" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Email error</div>
+        <br>
+        <label for="age">Enter user age:</label>
+        <input type="text" th:field="*{age}" id="age"/>
+        <div style="color:red" th:if="${#fields.hasErrors('age')}" th:errors="*{age}">Age error</div>
+        <br>
+        <label for="password">Enter user password:</label>
+        <input type="text" th:field="*{password}" id="password"/>
+        <div style="color:red" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Password error</div>
+        <br>
+<!--        <div>-->
+<!--            <p>Choose role: </p>-->
+<!--&lt;!&ndash;            <select name="rolesSelected" multiple required size="6">&ndash;&gt;-->
+<!--&lt;!&ndash;                <div  th:each="role : ${allRoles}">&ndash;&gt;-->
+<!--&lt;!&ndash;                    <option th:text="${role.getRole()}" th:value="${role.getId()}" name="roles"/>&ndash;&gt;-->
+<!--&lt;!&ndash;                </div>&ndash;&gt;-->
+<!--&lt;!&ndash;            </select>&ndash;&gt;-->
+<!--            <div>-->
+<!--                <label>Role</label>-->
+<!--                <select class="form-select w-100" size="2"-->
+<!--                        name="rolesSelected" multiple>-->
+<!--                    <option th:each="role : ${roles}"-->
+<!--                            th:value="${role.id}"-->
+<!--                            th:text="${role.role}"/>-->
+<!--                    </option>-->
+<!--                </select>-->
+<!--            </div>-->
+<!--        </div>-->
+
+        <br>
+        <input type="submit" value="Create user">
+        <br>
+        <a th:href="@{/logout}">Logout</a>
+</form>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"
+        integrity="sha384-SR1sx49pcuLnqZUnnPwx6FCym0wLsk5JZuNx2bPPENzswTNFaQU1RDvt3wT4gWFG"
+        crossorigin="anonymous">
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.min.js"
+        integrity="sha384-j0CNLUeiqtyaRmlzUHCPZ+Gy5fQu0dQ6eZ/xAww941Ai1SxSY+0EQqNXNE6DZiVc"
+        crossorigin="anonymous">
+</script>
+</body>
+</html>

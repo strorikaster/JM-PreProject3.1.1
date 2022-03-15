@@ -26,13 +26,13 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         if (roles.size() > 1) {
             if(roles.contains("ADMIN") && roles.contains("USER")) {
-                httpServletResponse.sendRedirect("/user/lk");
+                httpServletResponse.sendRedirect("/admin");
             }
         } else {
             if (roles.contains("ADMIN")) {
                 httpServletResponse.sendRedirect("/admin");
             } else {
-                httpServletResponse.sendRedirect("/user/lk");
+                httpServletResponse.sendRedirect("/user");
             }
         }
     }
